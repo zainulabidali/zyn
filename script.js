@@ -62,10 +62,23 @@ function addEntry(data = null, returnDiv = false) {
   if (returnDiv) return div;
 }
 
+/** Enhanced and cleaner createMaterialRow function with smaller button **/
 function createMaterialRow() {
   return `
     <tr>
-      <td><input type="text" class="mat-name" placeholder="Material name" oninput="saveToLocal()"></td>
+      <td>
+        <div style="display:flex; flex-direction:column; gap:4px;">
+          <input list="material-options" class="mat-name" placeholder="Material name" onchange="saveToLocal()">
+          <datalist id="material-options">
+            <option value="MDF">
+            <option value="Paint">
+            <option value="Sticker">
+            <option value="Plywood">
+            <option value="Veneer">
+          </datalist>
+          <button type="button" class="no-print" style="font-size: 12px; padding: 2px 6px;" onclick="addCustomMaterialOption(this)">+ Add to List</button>
+        </div>
+      </td>
       <td><input type="number" class="qty" value="0" oninput="updateAllTotals()"></td>
       <td><input type="number" class="unit" value="0" oninput="updateAllTotals()"></td>
       <td><input type="number" class="line-total" readonly></td>
@@ -73,6 +86,22 @@ function createMaterialRow() {
     </tr>
   `;
 }
+
+function addCustomMaterialOption(button) {
+  const row = button.closest('tr');
+  const input = row.querySelector('.mat-name');
+  const value = input.value.trim();
+  const list = document.getElementById('material-options');
+  if (!value) return;
+  const exists = Array.from(list.options).some(option => option.value === value);
+  if (!exists) {
+    const opt = document.createElement('option');
+    opt.value = value;
+    list.appendChild(opt);
+  }
+}
+
+
 
 function addMaterialRow(button) {
   const tbody = button.closest('.entry').querySelector('.material-body');
