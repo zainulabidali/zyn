@@ -168,14 +168,14 @@ button {
   margin-top: 10px;
   padding: 6px 12px;
   cursor: pointer;
-  background-color: #007bff;
+  background-color: #0f3b6a;
   color: white;
   border: none;
   border-radius: 4px;
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #2477b3;
 }
 
 .remove-item-btn {
@@ -183,7 +183,7 @@ button:hover {
 }
 
 .remove-item-btn:hover {
-  background-color: #b02a37;
+  background-color: #742129;
 }
 
 .button-group button {

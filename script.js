@@ -9,7 +9,7 @@ function addEntry(data = null, returnDiv = false) {
   div.innerHTML = `
     <h3>Item ${count}</h3>
     <label>Item Name: </label>
-    <input type="text" class="item-name" placeholder="Enter item name" oninput="saveToLocal()"><br><br>
+    <input type="text" class=" item-name" placeholder="Enter item name" oninput="saveToLocal()"><br><br>
 
     <table class="material-table">
       <thead>
@@ -29,7 +29,7 @@ function addEntry(data = null, returnDiv = false) {
     <button onclick="toggleMaterialSummary()" id="summary-toggle-btn">📊 Show Material Summary</button>
     <div id="material-summary"></div>
 
-    <div class="total-box">
+    <div class="total-box ">
       <div><strong>Grand Total:</strong> <input type="number" class="grand-total" readonly></div>
       <div><label>Total Cost:</label> <input type="number" class="total-cost" readonly></div>
       <div><label>Profit %:</label> <input type="number" class="profit-percent" value="0" oninput="calculateTotals()"></div>
@@ -66,7 +66,7 @@ function addEntry(data = null, returnDiv = false) {
 function createMaterialRow() {
   return `
     <tr>
-      <td>
+      <td data-label="Material">
         <div style="display:flex; flex-direction:column; gap:4px;">
           <input list="material-options" class="mat-name" placeholder="Material name" onchange="saveToLocal()">
           <datalist id="material-options">
@@ -79,13 +79,14 @@ function createMaterialRow() {
           <button type="button" class="no-print" style="font-size: 12px; padding: 2px 6px;" onclick="addCustomMaterialOption(this)">+ Add to List</button>
         </div>
       </td>
-      <td><input type="number" class="qty" value="0" oninput="updateAllTotals()"></td>
-      <td><input type="number" class="unit" value="0" oninput="updateAllTotals()"></td>
-      <td><input type="number" class="line-total" readonly></td>
-      <td class="no-print"><button onclick="removeMaterialRow(this)">Remove</button></td>
+      <td data-label="Quantity"><input type="number" class="qty" value="0" oninput="updateAllTotals()"></td>
+      <td data-label="Unit Price"><input type="number" class="unit" value="0" oninput="updateAllTotals()"></td>
+      <td data-label="Total"><input type="number" class="line-total" readonly></td>
+      <td data-label="Action" class="no-print"><button onclick="removeMaterialRow(this)">Remove</button></td>
     </tr>
   `;
 }
+
 
 function addCustomMaterialOption(button) {
   const row = button.closest('tr');
