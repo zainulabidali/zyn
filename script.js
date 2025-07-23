@@ -9,9 +9,24 @@ window.addEntry = function addEntry(data = null) {
   div.className = 'entry';
 
   div.innerHTML = `
-    <h3>Item ${count}</h3>
-    <label>Item Name: </label>
-    <input type="text" class="item-name" placeholder="Enter item name" oninput="saveToFirebase()"><br><br>
+   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+  <h3>Item ${count}</h3>
+
+  <div>
+    <label for="quoteNo" style="margin-right: 10px;">Quote No:</label>
+    <input type="text" id="quoteNo" style="width: 120px; padding: 4px;">
+  </div>
+</div>
+
+<input
+  type="text"
+  id="itemName"
+  class="item-name"
+  placeholder="particular name"
+  oninput="saveToFirebase()"
+  style="width: 100%; max-width: 800px; font-size: 16px; padding: 8px; box-sizing: border-box;"
+>
+
 
     <table class="material-table">
       <thead>
@@ -29,7 +44,7 @@ window.addEntry = function addEntry(data = null) {
     <button class="no-print" onclick="addMaterialRow(this)">+ Add Material</button>
 
 
-    <button onclick="toggleMaterialSummary()" id="summary-toggle-btn">📊 Show Material Summary</button>
+    <button onclick="toggleMaterialSummary()" id="summary-toggle-btn">📊 Description</button>
     <div id="material-summary"></div>
 
     <div class="total-box">
@@ -207,7 +222,7 @@ window.toggleMaterialSummary = function () {
 
 
 
-  toggleBtn.textContent = '❌ Hide Summary';
+  toggleBtn.textContent = '❌ Hide ';
 };
 
 function saveToFirebase() {
