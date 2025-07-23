@@ -1,18 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <meta charset="UTF-8">
   <title>Shuhaib</title>
-  <link rel="stylesheet" href="style.css">
+  
   <style>
-    .no-print { margin-right: 10px; }
-    .entry { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; }
-    .total-box input { width: 100px; margin-left: 5px; }
-    table { width: 100%; margin-top: 10px; border-collapse: collapse; }
-    th, td { border: 1px solid #ccc; padding: 5px; text-align: left; }
-    #material-summary { margin-top: 10px; background: #f9f9f9; padding: 10px; border: 1px solid #ddd; }
+    .no-print {
+      margin-right: 10px;
+    }
+
+    .entry {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    .total-box input {
+      width: 100px;
+      margin-left: 5px;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 10px;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      border: 1px solid #ccc;
+      padding: 5px;
+      text-align: left;
+    }
+
+    #material-summary {
+      margin-top: 10px;
+      background: #f9f9f9;
+      padding: 10px;
+      border: 1px solid #ddd;
+    }
   </style>
 </head>
+
 <body>
 
   <h2>Shuhaib</h2>
@@ -24,9 +57,10 @@
     <button onclick="window.print()">🖨️ Print</button>
     <button onclick="clearAll()">🗑️ Clear All</button>
   </div>
+  
 
-  <script src="script.js"></script>
+
+  <script type="module" src="./script.js"></script>
 </body>
-</html> 
 
-
+</html>

@@ -1,6 +1,8 @@
+import { db, ref, set, get, child } from './firebase.js';
+
 let count = 0;
 
-function addEntry(data = null, returnDiv = false) {
+window.addEntry = function addEntry(data = null) {
   count++;
   const container = document.getElementById('container');
   const div = document.createElement('div');
@@ -9,7 +11,7 @@ function addEntry(data = null, returnDiv = false) {
   div.innerHTML = `
     <h3>Item ${count}</h3>
     <label>Item Name: </label>
-    <input type="text" class=" item-name" placeholder="Enter item name" oninput="saveToLocal()"><br><br>
+    <input type="text" class="item-name" placeholder="Enter item name" oninput="saveToFirebase()"><br><br>
 
     <table class="material-table">
       <thead>
@@ -26,16 +28,27 @@ function addEntry(data = null, returnDiv = false) {
 
     <button class="no-print" onclick="addMaterialRow(this)">+ Add Material</button>
 
+
     <button onclick="toggleMaterialSummary()" id="summary-toggle-btn">📊 Show Material Summary</button>
     <div id="material-summary"></div>
 
-    <div class="total-box ">
-      <div><strong>Grand Total:</strong> <input type="number" class="grand-total" readonly></div>
-      <div><label>Total Cost:</label> <input type="number" class="total-cost" readonly></div>
-      <div><label>Profit %:</label> <input type="number" class="profit-percent" value="0" oninput="calculateTotals()"></div>
-      <div><label>Profit:</label> <input type="number" class="profit-amount" readonly></div>
-      <div><label>GROSS:</label> <input type="number" class="gross-amount" readonly></div>
-    </div>
+    <div class="total-box">
+  <!-- Row: Grand Total + Total Cost -->
+  
+    <div class="item"><strong>Grand Total:</strong> <input type="number" class="grand-total" readonly></div>
+    <div class="item"><label>Total Cost:</label> <input type="number" class="total-cost" readonly></div>
+  
+
+  <!-- Below rows: Profit % -->
+  <div class="item"><label>Profit %:</label> <input type="number" class="profit-percent" value="0" oninput="calculateTotals()"></div>
+
+  <!-- Profit -->
+  <div class="item"><label>Profit:</label> <input type="number" class="profit-amount" readonly></div>
+
+  <!-- GROSS -->
+  <div class="item"><label>GROSS:</label> <input type="number" class="gross-amount" readonly></div>
+</div>
+
 
     <div style="text-align:right; margin-top:10px;">
       <button class="remove-item-btn no-print" onclick="removeEntry(this)">🗑 Remove Item</button>
@@ -59,16 +72,17 @@ function addEntry(data = null, returnDiv = false) {
     calculateTotals();
   }
 
-  if (returnDiv) return div;
-}
+};
 
-/** Enhanced and cleaner createMaterialRow function with smaller button **/
+
+
 function createMaterialRow() {
+
   return `
     <tr>
-      <td data-label="Material">
+      <td>
         <div style="display:flex; flex-direction:column; gap:4px;">
-          <input list="material-options" class="mat-name" placeholder="Material name" onchange="saveToLocal()">
+          <input list="material-options" class="mat-name" placeholder="Material name" onchange="saveToFirebase()">
           <datalist id="material-options">
             <option value="MDF">
             <option value="Paint">
@@ -79,16 +93,15 @@ function createMaterialRow() {
           <button type="button" class="no-print" style="font-size: 12px; padding: 2px 6px;" onclick="addCustomMaterialOption(this)">+ Add to List</button>
         </div>
       </td>
-      <td data-label="Quantity"><input type="number" class="qty" value="0" oninput="updateAllTotals()"></td>
-      <td data-label="Unit Price"><input type="number" class="unit" value="0" oninput="updateAllTotals()"></td>
-      <td data-label="Total"><input type="number" class="line-total" readonly></td>
-      <td data-label="Action" class="no-print"><button onclick="removeMaterialRow(this)">Remove</button></td>
+      <td><input type="number" class="qty" value="0" oninput="updateAllTotals()"></td>
+      <td><input type="number" class="unit" value="0" oninput="updateAllTotals()"></td>
+      <td><input type="number" class="line-total" readonly></td>
+      <td class="no-print"><button onclick="removeMaterialRow(this)">Remove</button></td>
     </tr>
   `;
 }
 
-
-function addCustomMaterialOption(button) {
+window.addCustomMaterialOption = function (button) {
   const row = button.closest('tr');
   const input = row.querySelector('.mat-name');
   const value = input.value.trim();
@@ -100,28 +113,27 @@ function addCustomMaterialOption(button) {
     opt.value = value;
     list.appendChild(opt);
   }
-}
+};
 
-
-
-function addMaterialRow(button) {
+window.addMaterialRow = function (button) {
   const tbody = button.closest('.entry').querySelector('.material-body');
   tbody.insertAdjacentHTML('beforeend', createMaterialRow());
   updateAllTotals();
-}
+};
 
-function removeMaterialRow(button) {
-  const row = button.closest('tr');
-  row.remove();
+window.removeMaterialRow = function (button) {
+  if (!confirm('Remove this material?')) return;
+  button.closest('tr').remove();
   updateAllTotals();
-}
+};
 
-function removeEntry(button) {
+window.removeEntry = function (button) {
+  if (!confirm('Remove this item?')) return;
   const itemBox = button.closest('.entry');
   itemBox.remove();
   renumberItems();
-  saveToLocal();
-}
+  saveToFirebase();
+};
 
 function renumberItems() {
   const entries = document.querySelectorAll('.entry');
@@ -156,14 +168,14 @@ function updateAllTotals() {
     entry.querySelector('.gross-amount').value = grossAmount.toFixed(2);
   });
 
-  saveToLocal();
+  saveToFirebase();
 }
 
-function calculateTotals() {
+window.calculateTotals = function () {
   updateAllTotals();
-}
+};
 
-function toggleMaterialSummary() {
+window.toggleMaterialSummary = function () {
   const summaryDiv = document.getElementById('material-summary');
   const toggleBtn = document.getElementById('summary-toggle-btn');
 
@@ -179,34 +191,26 @@ function toggleMaterialSummary() {
   let totalCost = 0;
 
   document.querySelectorAll('.material-body tr').forEach(row => {
-    const nameInput = row.querySelector('.mat-name');
-    const qtyInput = row.querySelector('.qty');
-    const unitInput = row.querySelector('.unit');
-
-    if (!nameInput || !qtyInput || !unitInput) return;
-
-    const name = nameInput.value.trim();
-    const qty = parseFloat(qtyInput.value) || 0;
-    const unit = parseFloat(unitInput.value) || 0;
-
-    if (!name || qty === 0 || unit === 0) return;
-
-    summarySet.add(name);
-    totalCost += qty * unit;
+    const name = row.querySelector('.mat-name').value.trim();
+    const qty = parseFloat(row.querySelector('.qty').value) || 0;
+    const unit = parseFloat(row.querySelector('.unit').value) || 0;
+    if (name && qty && unit) {
+      summarySet.add(name);
+      totalCost += qty * unit;
+    }
   });
 
-  const html = `
-    <div class="material-summary-overall">
-      <p>📦 <strong>Total Materials Used:</strong> ${summarySet.size}</p>
-      <p>💰 <strong>Total Material Cost:</strong> ₹${totalCost.toFixed(2)}</p>
-    </div>
+  summaryDiv.innerHTML = `
+    <p>📦 <strong>Total Materials Used:</strong> ${summarySet.size}</p>
+    <p>💰 <strong>Total Material Cost:</strong> ₹${totalCost.toFixed(2)}</p>
   `;
 
-  summaryDiv.innerHTML = html;
-  toggleBtn.textContent = '❌ Hide Summary';
-}
 
-function saveToLocal() {
+
+  toggleBtn.textContent = '❌ Hide Summary';
+};
+
+function saveToFirebase() {
   const entries = document.querySelectorAll('.entry');
   const data = [];
 
@@ -226,20 +230,40 @@ function saveToLocal() {
     data.push({ name: itemName, materials, profit });
   });
 
-  localStorage.setItem('materialEstimatorData', JSON.stringify(data));
+  set(ref(db, 'estimatorData'), data);
 }
 
-function clearAll() {
-  localStorage.removeItem('materialEstimatorData');
+window.clearAll = function () {
+  if (!confirm('⚠️ Are you sure you want to clear everything?')) return;
+  set(ref(db, 'estimatorData'), []);
   document.getElementById('container').innerHTML = '';
   count = 0;
+};
+
+function loadFromFirebase() {
+  const dbRef = ref(db);
+  get(child(dbRef, 'estimatorData')).then(snapshot => {
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      data.forEach(item => addEntry(item));
+      updateAllTotals();
+    } else {
+      showTopUpPrompt(); // Show prompt only if no data
+    }
+  });
 }
 
-window.addEventListener('load', () => {
-  const saved = localStorage.getItem('materialEstimatorData');
-  if (saved) {
-    const data = JSON.parse(saved);
-    data.forEach(item => addEntry(item));
-    updateAllTotals();
-  }
-});
+window.showTopUpPrompt = function () {
+  document.getElementById('topup-warning').style.display = 'block';
+};
+
+window.handleTopUpYes = function () {
+  document.getElementById('topup-warning').style.display = 'none';
+  addEntry({ name: 'Top-Up', materials: [], profit: 10 });
+};
+
+window.handleTopUpNo = function () {
+  document.getElementById('topup-warning').style.display = 'none';
+};
+
+window.addEventListener('load', loadFromFirebase);
