@@ -234,3 +234,5 @@ window.handleTopUpNo = function () {
 };
 
 window.addEventListener('load', loadFromFirebase);
+const headingRef = firebase.database().ref('projectHeading');
+
